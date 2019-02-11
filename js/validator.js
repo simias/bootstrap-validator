@@ -258,11 +258,16 @@
 
     errors = $('<ul/>')
       .addClass('list-unstyled')
-      .append($.map(errors, function (error) { return $('<li/>')[method](error) }))
+      .append($.map(errors, function (error) {
+          return $('<li/>')
+              .append($('<small/>',
+                        { class: 'text-danger'})[method](error)) }))
 
     $block.data('bs.validator.originalContent') === undefined && $block.data('bs.validator.originalContent', $block.html())
     $block.empty().append(errors)
     $group.addClass('has-error has-danger')
+
+    $el.addClass('is-invalid')
 
     $group.hasClass('has-feedback')
       && $feedback.removeClass(this.options.feedback.success)
@@ -277,6 +282,7 @@
 
     $block.html($block.data('bs.validator.originalContent'))
     $group.removeClass('has-error has-danger has-success')
+    $el.removeClass('is-invalid')
 
     $group.hasClass('has-feedback')
       && $feedback.removeClass(this.options.feedback.error)
@@ -310,7 +316,12 @@
 
   Validator.prototype.toggleSubmit = function () {
     if (!this.options.disable) return
-    this.$btn.toggleClass('disabled', this.isIncomplete() || this.hasErrors())
+
+    var disabled = this.isIncomplete() || this.hasErrors()
+
+    this.$btn
+          .toggleClass('disabled', disabled)
+          .prop('disabled', disabled)
   }
 
   Validator.prototype.defer = function ($el, callback) {
